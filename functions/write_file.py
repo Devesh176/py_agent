@@ -10,7 +10,7 @@ def write_file(working_directory, file_path, content):
     
     # if not os.path.isfile(target_file_path):
     #     return f'Error: File not found or is not a regular file: "{file_path}"'
-    print(os.path.exists(target_file_path))
+    # print(os.path.exists(target_file_path))
     if not os.path.exists(target_file_path):
         
         
