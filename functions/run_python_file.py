@@ -1,5 +1,6 @@
 import os
 import subprocess
+from google.genai import types
 
 def run_python_file(working_directory, file_path, args=[]):
     absolute_path = os.path.abspath(working_directory)
@@ -49,4 +50,27 @@ def run_python_file(working_directory, file_path, args=[]):
         return f"CalledProcessError: executing Python file: {e5}"
 
     
-     
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Runs the python file and returns the output.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The current working directory.",
+            ),
+            "file_path": types.Schema( # Corrected: snake_case
+                type=types.Type.STRING,
+                description="The actual path of the python file relative to the working directory, to be executed."
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="The arguments which need to be passed while executing the python file.",
+                items=types.Schema(type=types.Type.STRING) # Corrected: Added items definition
+            ),
+        },
+        required=["directory", "file_path"]
+    ),
+)

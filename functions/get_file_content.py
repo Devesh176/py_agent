@@ -1,4 +1,6 @@
 import os
+from google.genai import types
+
 
 def get_file_content(working_directory, file_path):
     absolute_path = os.path.abspath(working_directory)
@@ -33,3 +35,24 @@ def get_file_content(working_directory, file_path):
     except EOFError as e6:
         return f'Error: {e6}, End of input reached unexpectedly. No input was provided.'
 
+
+
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content", # Corrected: Name to match function
+    description="Returns the content stored inside the file.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The current working directory.",
+            ),
+            "file_path": types.Schema( # Corrected: snake_case
+                type=types.Type.STRING,
+                description="The actual path of the file relative to the working directory, whose content needs to be returned."
+            ),
+        },
+        required=["directory", "file_path"]
+    ),
+)

@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 
 def write_file(working_directory, file_path, content):
     absolute_path = os.path.abspath(working_directory)
@@ -53,3 +54,26 @@ def write_file(working_directory, file_path, content):
         except IOError or OSError as e5:
             return f'Error: {e5}, An operating system error occured during file access: {target_file_path}'
 
+
+schema_write_file = types.FunctionDeclaration(
+    name="write_file",
+    description="Write the content in the specified file path. Override the content if it already exists.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The current working directory.",
+            ),
+            "file_path": types.Schema( # Corrected: snake_case
+                type=types.Type.STRING,
+                description="The path of the file in which content needs to be written, relative to the working directory."
+            ),
+            "content": types.Schema(
+                type=types.Type.STRING,
+                description="The content to be written in the specified file."
+            ),
+        },
+        required=["directory", "file_path", "content"] # It's good practice to list required parameters
+    ),
+)
