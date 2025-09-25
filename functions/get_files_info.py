@@ -44,8 +44,7 @@ def get_files_info(working_directory, directory="."):
         
         # Append information for this file/directory
         files_info += f"- {file_name}: file_size={file_size} bytes, is_dir={is_dir}\n"
-    
-    print("herer")
+ 
     return files_info
 
 
