@@ -10,3 +10,4 @@ wheels/
 .venv
 
 .env
+huggingface_token.py

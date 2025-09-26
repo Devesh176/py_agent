@@ -1,7 +1,7 @@
 import os
 from google.genai import types
 
-def write_file(working_directory, file_path, content):
+def write_file(working_directory: str, file_path: str, content: str) -> str:
     absolute_path = os.path.abspath(working_directory)
     target_file_path = os.path.join(absolute_path, file_path)
     
