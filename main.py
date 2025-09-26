@@ -186,47 +186,110 @@ def generate_content(model, tokenizer, messages, verbose):
         return response_text
 
 
+# def main():
+#     load_dotenv()
+#     HF_TOKEN = token ## add your token here
+#     login(token=HF_TOKEN)
+#     verbose = "--verbose" in sys.argv
+#     args = []
+#     for arg in sys.argv[1:]:
+#         if not arg.startswith("--"):
+#             args.append(arg)
+
+#     if not args:
+#         print("AI Code Assistant (Hugging Face)")
+#         print('\nUsage: python main.py "your prompt here" [--verbose]')
+#         sys.exit(1)
+
+#     # --- Hugging Face Model Loading ---
+#     model_name = "mistralai/Mistral-7B-Instruct-v0.2"
+#     print(f"Loading model: {model_name}...")
+    
+#     # Use bfloat16 for less memory usage
+#     tokenizer = AutoTokenizer.from_pretrained(model_name)
+#     model = AutoModelForCausalLM.from_pretrained(
+#         model_name,
+#         torch_dtype=torch.bfloat16,
+#         device_map="auto" # Automatically use GPU if available
+#     )
+#     print("Model loaded successfully. You can now start chatting.")
+#     print("Type 'exit' or 'quit' to end the session.")
+    
+#     while True:
+#         user_prompt = " ".join(args)
+
+#         if user_prompt.lower() in ["exit", "quit"]:
+#             print("Goodbye!")
+#             break
+        
+#         if verbose:
+#             print(f"User prompt: {user_prompt}\n")
+
+#         # The 'messages' format is a standard that chat models understand
+#         # We add our system prompt first to provide instructions.
+#         messages = [
+#             {"role": "user", "content": system_prompt + "\n" + user_prompt}
+#         ]
+
+#         generate_content(model, tokenizer, messages, verbose)
+
+
 def main():
-    load_dotenv()
+    # ... (keep your existing setup code like load_dotenv, verbose check, etc.)
+
+    # --- CHOOSE YOUR LIGHTWEIGHT MODEL HERE ---
+
+    # My top recommendation for the best balance of performance and size
     HF_TOKEN = token ## add your token here
     login(token=HF_TOKEN)
     verbose = "--verbose" in sys.argv
-    args = []
-    for arg in sys.argv[1:]:
-        if not arg.startswith("--"):
-            args.append(arg)
-
-    if not args:
-        print("AI Code Assistant (Hugging Face)")
-        print('\nUsage: python main.py "your prompt here" [--verbose]')
-        sys.exit(1)
-
-    # --- Hugging Face Model Loading ---
-    model_name = "mistralai/Mistral-7B-Instruct-v0.2"
-    print(f"Loading model: {model_name}...")
+    model_name = "microsoft/Phi-3-mini-4k-instruct"
     
-    # Use bfloat16 for less memory usage
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # Uncomment the one you want to use:
+    # model_name = "google/gemma-2b-it" # Requires you to accept license on its HF page
+    # model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0" # The smallest and fastest option
+
+    # IMPORTANT: Phi-3 requires an extra tokenizer argument
+    # If you use Phi-3, the tokenizer MUST have `trust_remote_code=True`
+    # For other models, this is not needed.
+    tokenizer_kwargs = {}
+    if "Phi-3" in model_name:
+        tokenizer_kwargs['trust_remote_code'] = True
+
+
+    print(f"Loading model onto CPU: {model_name}... (This will be much faster now)")
+    
+    tokenizer = AutoTokenizer.from_pretrained(model_name, **tokenizer_kwargs)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=torch.bfloat16,
-        device_map="auto" # Automatically use GPU if available
+        device_map="cpu",
+        trust_remote_code=True # This is also needed for Phi-3
     )
-    print("Model loaded successfully.")
     
-    user_prompt = " ".join(args)
+    print("Model loaded successfully. You can now start chatting.")
+    print("Type 'exit' or 'quit' to end the session.")
 
-    if verbose:
-        print(f"User prompt: {user_prompt}\n")
+    # --- Start an interactive loop ---
+    while True:
+        user_prompt = input("\nYou: ")
+        
+        if user_prompt.lower() in ["exit", "quit"]:
+            print("Goodbye!")
+            break
+            
+        # The prompt formatting needs to be applied by the tokenizer
+        # We can create the messages list and let the tokenizer handle the template
+        messages = [
+            # For these smaller models, a complex system prompt isn't as necessary
+            # unless you are doing function calling. Let's simplify for chat.
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        # We will handle prompt formatting inside generate_content
 
-    # The 'messages' format is a standard that chat models understand
-    # We add our system prompt first to provide instructions.
-    messages = [
-        {"role": "user", "content": system_prompt + "\n" + user_prompt}
-    ]
+        generate_content(model, tokenizer, messages, verbose)
 
-    generate_content(model, tokenizer, messages, verbose)
-
+# You may need to adjust the generate_content function slightly for chat templates
 
 if __name__ == "__main__":
     main()
