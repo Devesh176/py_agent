@@ -74,6 +74,7 @@ schema_write_file = types.FunctionDeclaration(
                 description="The content to be written in the specified file."
             ),
         },
-        required=["directory", "file_path", "content"] # It's good practice to list required parameters
+        # required=["directory", "file_path", "content"] # It's good practice to list required parameters
+        required=["file_path", "content"]
     ),
 )

@@ -71,6 +71,7 @@ schema_run_python_file = types.FunctionDeclaration(
                 items=types.Schema(type=types.Type.STRING) # Corrected: Added items definition
             ),
         },
-        required=["directory", "file_path"]
+        # required=["directory", "file_path"] #! change here if we want gpt to decide working directory
+        required=["file_path"]
     ),
 )

@@ -53,6 +53,7 @@ schema_get_file_content = types.FunctionDeclaration(
                 description="The actual path of the file relative to the working directory, whose content needs to be returned."
             ),
         },
-        required=["directory", "file_path"]
+        # required=["directory", "file_path"] #! change here if we want gpt to decide working directory
+        required=["file_path"]
     ),
 )

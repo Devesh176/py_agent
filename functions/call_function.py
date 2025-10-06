@@ -102,6 +102,7 @@ def call_function(function_call_part, verbose=False):
             ],
         )
     args = dict(function_call_part.args)
+    print("argsd ", args)
     args["working_directory"] = WORKING_DIR
     function_result = function_map[function_name](**args)
     return types.Content(
