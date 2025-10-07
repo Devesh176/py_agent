@@ -10,7 +10,8 @@ from functions.call_function import call_function, available_functions
 
 def main():
     load_dotenv()
-
+    
+    
     verbose = "--verbose" in sys.argv
     args = []
     for arg in sys.argv[1:]:
@@ -21,54 +22,103 @@ def main():
         print("AI Code Assistant")
         print('\nUsage: python main.py "your prompt here" [--verbose]')
         print('Example: python main.py "How do I fix the calculator?"')
+        print('To end the conversation type "exit" or "quit".')
         sys.exit(1)
+    
+    print("AI Code Assistant (Assign me tasks !)")
+    # print('\nUsage: python main.py "your prompt here" [--verbose]')
+    print('"How do I fix the calculator?"')
+    print('To end the conversation type "exit" or "quit".')
 
     api_key = os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
 
-    user_prompt = " ".join(args)
+    while True:
+        # user_prompt = " ".join(args)
+        user_prompt = str(input())
+        print('Welcome')
+        if user_prompt.lower() in ["exit", "quit"]:
+            print("Goodbye!")
+            break
 
-    if verbose:
-        print(f"User prompt: {user_prompt}\n")
+        if verbose:
+            print(f"User prompt: {user_prompt}\n")
 
-    messages = [
-        types.Content(role="user", parts=[types.Part(text=user_prompt)]),
-    ]
+        messages = [
+            types.Content(role="user", parts=[types.Part(text=user_prompt)]),
+        ]
+        print("messages:", messages, type(messages))
 
-    generate_content(client, messages, verbose)
+        
+            
+        result = generate_content(client, messages, verbose)
+        if result:
+            print(" The assigned task successfully completed! ")
+            result = None
 
 
 def generate_content(client, messages, verbose):
     verbose = True
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions], system_instruction=system_prompt
-        ),
-    )
-    if verbose:
-        print("Prompt tokens:", response.usage_metadata.prompt_token_count)
-        print("Response tokens:", response.usage_metadata.candidates_token_count)
 
-    if not response.function_calls:
-        return response.text
-
-    function_responses = []
-    for function_call_part in response.function_calls:
-        function_call_result = call_function(function_call_part, verbose)
-        if (
-            not function_call_result.parts
-            or not function_call_result.parts[0].function_response
-        ):
-            raise Exception("empty function call result")
+    for _ in range(10):   # limit to 10 iters
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-001",
+            contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions], system_instruction=system_prompt
+            ),
+        )
         if verbose:
-            print(f"-> {function_call_result.parts[0].function_response.response}")
-        function_responses.append(function_call_result.parts[0])
+            print("Prompt tokens:", response.usage_metadata.prompt_token_count)
+            print("Response tokens:", response.usage_metadata.candidates_token_count)
 
-    if not function_responses:
-        raise Exception("no function responses generated, exiting.")
+        if not response.function_calls:
+            print("===== Finished the Assigned Task ======== ")
+            print(response.text)
+            return response.text
+        
+        candidate_list = response.candidates
+        if candidate_list:
+            for candidate in candidate_list:
+                if candidate.content:
+                    messages.append(candidate.content)  ## ambiguous
+                    if verbose:
+                        print("candidate text: ", candidate.content)
+            
+            
+            function_responses = []
 
+            for function_call_part in response.function_calls:
+                function_call_result = call_function(function_call_part, verbose)
+                if (
+                    not function_call_result.parts
+                    or not function_call_result.parts[0].function_response
+                ):
+                    raise Exception("empty function call result")
+                if verbose:
+                    print(f"-> {function_call_result.parts[0].function_response.response}")
+                function_responses.append(function_call_result.parts[0])
+
+            if not function_responses:
+                print("no function responses generated, exiting.")
+                break
+            
+            # after each iterration convert the function responses types.content and apppend to messages
+            messages.extend(
+                [
+                    types.Content(
+                        role="tool",
+                        parts=function_responses,
+                    )
+                ]
+            )
+
+        else:
+            print("Terminated becauase of no further function calls.")
+            break
+
+    return None
+    
 
 if __name__ == "__main__":
     main()
