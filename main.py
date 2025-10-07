@@ -58,6 +58,19 @@ def main():
 
 
 def generate_content(client, messages, verbose):
+    # verbose = True
+
+    for i in range(20):
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-001",
+            contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions], system_instruction=system_prompt
+            ),
+        )
+        if verbose:
+            print("Prompt tokens:", response.usage_metadata.prompt_token_count)
+            print("Response tokens:", response.usage_metadata.candidates_token_count)
     verbose = True
 
     for _ in range(10):   # limit to 10 iters
@@ -72,6 +85,31 @@ def generate_content(client, messages, verbose):
             print("Prompt tokens:", response.usage_metadata.prompt_token_count)
             print("Response tokens:", response.usage_metadata.candidates_token_count)
 
+        
+
+        function_responses = []
+
+        if response.candidates:
+            for candidate in response.candidates:
+                if candidate is None or candidate.content is None:
+                    continue
+                messages.append(candidate.content)
+
+        if response.function_calls:
+            for function_call_part in response.function_calls:
+                function_call_result = call_function(function_call_part, verbose)
+                if (
+                    not function_call_result.parts
+                    or not function_call_result.parts[0].function_response
+                ):
+                    raise Exception("empty function call result")
+                messages.append(function_call_result)
+                if verbose:
+                    print(f"-> {function_call_result.parts[0].function_response.response}")
+                function_responses.append(function_call_result.parts[0])
+        else:
+            print(response.text)
+            return response.text
         if not response.function_calls:
             print("===== Finished the Assigned Task ======== ")
             print(response.text)
@@ -99,26 +137,9 @@ def generate_content(client, messages, verbose):
                     print(f"-> {function_call_result.parts[0].function_response.response}")
                 function_responses.append(function_call_result.parts[0])
 
-            if not function_responses:
-                print("no function responses generated, exiting.")
-                break
-            
-            # after each iterration convert the function responses types.content and apppend to messages
-            messages.extend(
-                [
-                    types.Content(
-                        role="tool",
-                        parts=function_responses,
-                    )
-                ]
-            )
+        if not function_responses:
+            raise Exception("no function responses generated, exiting.")
 
-        else:
-            print("Terminated becauase of no further function calls.")
-            break
-
-    return None
-    
 
 if __name__ == "__main__":
     main()

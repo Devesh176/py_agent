@@ -34,7 +34,7 @@ def run_python_file(working_directory: str, file_path: str, args: list =[]) -> s
         if result.check_returncode():
             res += ' Process exited with code X.'
 
-        print("res", res)
+        print("result: ", res)
         return res
     
     except ValueError as e1:
