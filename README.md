@@ -1,10 +1,10 @@
 # AI Agent Instructions for py_agent
 
 ## Project Overview
-This is a Python-based AI coding assistant that supports both Gemini and Hugging Face models for code analysis and interaction. The project implements a function-calling architecture that allows AI models to safely interact with the filesystem and execute Python code.
+This is a Python-based AI coding assistant that supports "gemini-2.0-flash-001" for code analysis and interaction. The project implements a function-calling architecture that allows AI model to safely interact with the filesystem and execute Python code.
 
 ## Core Components
-- `/main.py`: Entry point with dual implementations (Gemini and HuggingFace)
+- `/main.py`: Entry point.
 - `/functions/`: Contains core function implementations for file operations:
   - `get_files_info.py`: Directory listing with file metadata
   - `get_file_content.py`: Safe file reading with path validation
@@ -14,7 +14,7 @@ This is a Python-based AI coding assistant that supports both Gemini and Hugging
 
 ## Key Patterns and Conventions
 1. **Path Safety**:
-   - All file operations are constrained to the working directory
+   - All file operations are constrained to the working directory (here set as `/calculator`)
    - Path validation using `os.path.abspath()` and `.startswith()` checks
    - Example: See `get_file_content.py` implementation
 
@@ -36,32 +36,23 @@ This is a Python-based AI coding assistant that supports both Gemini and Hugging
 - Python 3.10+ required (see `.python-version`)
 - Dependencies managed via `pyproject.toml`
 - Requires either:
-  - Google Gemini API key (in `.env`) (Older version)
-  - or HuggingFace Mistral model locally (Newer version)
-- You will need to access the "mistralai/Mistral-7B-Instruct-v0.2" model, get access and generate a token,  save the token in huggingface_token.py file as follows
-``` python
-   token = "your huggingface token"
+  - Google Gemini API key (in `.env`)
+  - To get access to Gemini API follow the link[!https://aistudio.google.com/app/api-keys?project=gen-lang-client-0272858766]
+- After successfully securing the API key, run the follwing command in terminal
+``` bash
+   cd py_agent
+   echo "GEMINI_API_KEY=Your_api_key" >> .env
 ```
 
 ## Common Operations
 1. **Running the Assistant**:
    ```bash
-   python main.py "your prompt here" [--verbose]
-   ```
-
-2. **Running Calculator Example**:
-   ```bash
-   python calculator/main.py "3 + 5"
-   ```
-
-3. **Running Tests**:
-   ```bash
-   python calculator/tests.py
+   uv run main.py "your prompt here" [--verbose]
    ```
 
 ## Integration Points
 1. Model Integration:
-   - System prompts defined in `system_prompt.txt` and `prompts.py`
+   - System prompts defined in `prompts.py`
    - Model function calling protocol in `generate_content()` function
 
 2. Function Registration:
