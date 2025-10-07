@@ -3,6 +3,17 @@
 ## Project Overview
 This is a Python-based AI coding assistant that supports "gemini-2.0-flash-001" for code analysis and interaction. The project implements a function-calling architecture that allows AI model to safely interact with the filesystem and execute Python code.
 
+```python
+                                             | |  
+        _ __  _   _     __ _  __ _  ___ _ __ | |_ 
+        | '_ \| | | |   / _` |/ _` |/ _ \ '_ \| __|
+        | |_) | |_| |  | (_| | (_| |  __/ | | | |_ 
+        | .__/ \__, |   \__,_|\__, |\___|_| |_|\__|
+        | |     __/ |_____     __/ |               
+        |_|    |___/______|   |___/                
+    
+```
+
 ## Core Components
 - `/main.py`: Entry point.
 - `/functions/`: Contains core function implementations for file operations:

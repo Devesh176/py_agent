@@ -18,17 +18,32 @@ def main():
         if not arg.startswith("--"):
             args.append(arg)
 
-    if not args:
-        print("AI Code Assistant")
-        print('\nUsage: python main.py "your prompt here" [--verbose]')
-        print('Example: python main.py "How do I fix the calculator?"')
-        print('To end the conversation type "exit" or "quit".')
-        sys.exit(1)
-    
-    print("AI Code Assistant (Assign me tasks !)")
-    # print('\nUsage: python main.py "your prompt here" [--verbose]')
-    print('"How do I fix the calculator?"')
+    print("AI Code Assistant")
+    logo = r"""                                                    _   
+                                             | |  
+        _ __  _   _     __ _  __ _  ___ _ __ | |_ 
+        | '_ \| | | |   / _` |/ _` |/ _ \ '_ \| __|
+        | |_) | |_| |  | (_| | (_| |  __/ | | | |_ 
+        | .__/ \__, |   \__,_|\__, |\___|_| |_|\__|
+        | |     __/ |_____     __/ |               
+        |_|    |___/______|   |___/                
+    """
+    print(logo)
+   
+    print('Usage: "your prompt here" [--verbose]')
+    print('Example: "How do I fix the calculator?"')
     print('To end the conversation type "exit" or "quit".')
+    # if not args:
+    #     print("AI Code Assistant")
+    #     print('\nUsage: python main.py "your prompt here" [--verbose]')
+    #     print('Example: python main.py "How do I fix the calculator?"')
+    #     print('To end the conversation type "exit" or "quit".')
+    #     sys.exit(1)
+    
+    # print("AI Code Assistant (Assign me tasks !)")
+    # # print('\nUsage: python main.py "your prompt here" [--verbose]')
+    # print('"How do I fix the calculator?"')
+    # print('To end the conversation type "exit" or "quit".')
 
     api_key = os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
